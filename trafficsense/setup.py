@@ -1,0 +1,31 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="trafficsense",
+    version="0.1.0",
+    packages=find_packages(),
+    install_requires=[
+        "pandas==2.1.4",
+        "numpy==1.26.2",
+        "scikit-learn==1.3.2",
+        "xgboost==2.0.3",
+        "lightgbm==4.1.0",
+        "imbalanced-learn==0.11.0",
+        "category-encoders==2.6.3",
+        "shap==0.44.0",
+        "fastapi==0.108.0",
+        "uvicorn==0.25.0",
+        "pydantic==2.5.3",
+        "streamlit==1.29.0",
+        "streamlit-folium==0.17.2",
+        "folium==0.15.1",
+        "plotly==5.18.0",
+        "geopy==2.4.1",
+        "haversine==2.8.0",
+        "tqdm==4.66.1",
+        "pytest==7.4.4",
+        "httpx==0.26.0",
+        "joblib==1.3.2",
+        "python-multipart==0.0.6"
+    ]
+)

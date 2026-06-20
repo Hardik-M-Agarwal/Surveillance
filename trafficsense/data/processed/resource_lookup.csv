@@ -1,0 +1,324 @@
+event_cause,severity,corridor,median_constables,road_closure_typical,typical_duration_min,suggested_police_station
+accident,High,Bellary Road 1,7.0,1,,R.T. Nagar
+accident,High,Hosur Road,7.0,1,74.62887731666666,Electronic City
+accident,High,Mysore Road,7.0,1,39.028780866666665,Byatarayanapura
+accident,High,Tumkur Road,7.0,1,,Yeshwanthpura
+accident,Low,Non-corridor,2.0,0,42.8945817,Jayanagara
+accident,Medium,Airport New South Road,3.0,0,68.80150233333333,Pulikeshinagar(F.Town)
+accident,Medium,Bannerghata Road,3.0,0,,Hulimavu
+accident,Medium,Bellary Road 1,3.0,0,49.81185180833333,Hebbala
+accident,Medium,Bellary Road 2,3.0,0,35.3543105,Yelahanka
+accident,Medium,CBD 2,3.0,0,,Cubbon Park
+accident,Medium,Hennur Main Road,3.0,0,,Hennuru
+accident,Medium,Hosur Road,3.0,0,71.30343171666667,Electronic City
+accident,Medium,Mysore Road,3.0,0,54.01660609999999,Byatarayanapura
+accident,Medium,ORR East 1,3.0,0,36.9388623,Bellandur
+accident,Medium,ORR East 2,3.0,0,,K.R. Pura
+accident,Medium,ORR North 1,3.0,0,41.37271345,Banaswadi
+accident,Medium,ORR North 2,3.0,0,30.72441755,Kodigehalli
+accident,Medium,ORR West 1,3.0,0,,K.S. Layout
+accident,Medium,Old Airport Road,3.0,0,35.956496816666665,Jeevanbheemanagar
+accident,Medium,Old Madras Road,3.0,0,41.571545316666665,Jeevanbheemanagar
+accident,Medium,Tumkur Road,3.0,0,37.806749716666666,Peenya
+accident,Medium,West of Chord Road,3.0,0,,Malleshwaram
+congestion,High,ORR North 1,7.0,1,,Banaswadi
+congestion,High,Tumkur Road,7.0,1,,Chikkabanavara
+congestion,Low,Non-corridor,2.0,0,42.636129950000004,Whitefield
+congestion,Medium,Bannerghata Road,3.0,0,,J.P. Nagar
+congestion,Medium,Bellary Road 1,3.0,0,,Sadashivanagar
+congestion,Medium,Hennur Main Road,3.0,0,102.70420786666666,Hennuru
+congestion,Medium,IRR(Thanisandra road),3.0,0,,Jeevanbheemanagar
+congestion,Medium,Magadi Road,3.0,0,,Kamakshipalya
+congestion,Medium,Mysore Road,3.0,0,,Kengeri
+congestion,Medium,ORR East 1,3.0,0,,HAL Old Airport
+congestion,Medium,ORR North 1,3.0,0,72.70130863333334,Hennuru
+congestion,Medium,ORR North 2,3.0,0,,Kodigehalli
+congestion,Medium,ORR West 1,3.0,0,,K.S. Layout
+congestion,Medium,Old Airport Road,3.0,0,1.56152965,Jeevanbheemanagar
+congestion,Medium,West of Chord Road,3.0,0,65.45038186666666,Byatarayanapura
+construction,Critical,Bannerghata Road,7.0,1,426.60936853333334,Mico Layout
+construction,Critical,Bellary Road 1,7.0,1,4320.0,Kodigehalli
+construction,Critical,Bellary Road 2,7.0,1,4320.0,Yelahanka
+construction,Critical,Hosur Road,7.0,1,4320.0,Ashok Nagar
+construction,Critical,Magadi Road,7.0,1,3603.1197480666665,Kamakshipalya
+construction,Critical,Mysore Road,7.0,1,2374.3895069166665,Chamarajpet
+construction,Critical,ORR East 2,7.0,1,2852.1638163166667,HAL Old Airport
+construction,Critical,ORR North 2,7.0,1,4320.0,Jalahalli
+construction,Critical,Old Airport Road,7.0,1,4320.0,HAL Old Airport
+construction,High,Airport New South Road,7.0,1,,Pulikeshinagar(F.Town)
+construction,High,Bellary Road 1,7.0,1,,Hebbala
+construction,High,Bellary Road 2,7.0,1,,Yelahanka
+construction,High,CBD 1,7.0,1,,Shivajinagar
+construction,High,Hennur Main Road,7.0,1,,Hennuru
+construction,High,IRR(Thanisandra road),7.0,1,64.20182368333333,Adugodi
+construction,High,Mysore Road,7.0,1,,City Market
+construction,High,ORR East 1,7.0,1,34.097350649999996,HSR Layout
+construction,High,ORR North 1,7.0,1,84.54522296666667,K.G. Halli
+construction,High,ORR West 1,7.0,1,,J.P. Nagar
+construction,High,Old Madras Road,7.0,1,,Shivajinagar
+construction,High,Tumkur Road,7.0,1,,Yeshwanthpura
+construction,High,Varthur Road,7.0,1,,HAL Old Airport
+construction,High,West of Chord Road,7.0,1,,Rajajinagar
+construction,Low,Non-corridor,2.0,0,3954.1524874666666,Hennuru
+construction,Medium,Airport New South Road,3.0,0,1444.87902435,Hennuru
+construction,Medium,Bannerghata Road,3.0,0,11.78033255,J.P. Nagar
+construction,Medium,Bellary Road 1,3.0,0,2432.6867015083335,Kodigehalli
+construction,Medium,Bellary Road 2,3.0,0,134.01126233333332,Yelahanka
+construction,Medium,Hennur Main Road,3.0,0,4320.0,Hennuru
+construction,Medium,IRR(Thanisandra road),3.0,0,4320.0,Ashok Nagar
+construction,Medium,Magadi Road,3.0,0,,Magadi Road
+construction,Medium,Mysore Road,3.0,0,1329.4673205166666,Halasuru Gate
+construction,Medium,ORR East 1,3.0,0,4320.0,HAL Old Airport
+construction,Medium,ORR East 2,3.0,0,4320.0,HAL Old Airport
+construction,Medium,ORR North 1,3.0,0,416.4596988166667,Hebbala
+construction,Medium,ORR North 2,3.0,0,,Kodigehalli
+construction,Medium,ORR West 1,3.0,0,4320.0,Banashankari
+construction,Medium,Old Airport Road,3.0,0,4320.0,HAL Old Airport
+construction,Medium,Old Madras Road,3.0,0,89.34101974166667,Ashok Nagar
+construction,Medium,Tumkur Road,3.0,0,,Yeshwanthpura
+construction,Medium,Varthur Road,3.0,0,2871.7622427333336,HAL Old Airport
+construction,Medium,West of Chord Road,3.0,0,,Vijayanagara
+debris,High,West of Chord Road,7.0,1,,Magadi Road
+debris,Low,Non-corridor,2.0,0,4320.0,Basavanagudi
+debris,Medium,Bellary Road 2,3.0,0,4320.0,Chikkajala
+debris,Medium,ORR West 1,3.0,0,,Banashankari
+fog_low_visibility,Low,Non-corridor,2.0,0,,Chikkabanavara
+fog_low_visibility,Medium,ORR North 2,3.0,0,,Kodigehalli
+others,Critical,Hosur Road,7.0,1,16279.602038266665,Ashok Nagar
+others,Critical,IRR(Thanisandra road),7.0,1,34689.907691316665,Adugodi
+others,Critical,Magadi Road,7.0,1,37826.52565715,Kamakshipalya
+others,Critical,Mysore Road,7.0,1,799.62619265,Ashok Nagar
+others,Critical,ORR North 1,7.0,1,79376.58893283334,K.G. Halli
+others,Critical,Tumkur Road,7.0,1,425.9449986166667,Peenya
+others,Critical,West of Chord Road,7.0,1,178.83197656666667,Vijayanagara
+others,High,Bellary Road 1,7.0,1,90.87172934166668,High ground
+others,High,Hosur Road,7.0,1,112.07313198333333,Adugodi
+others,High,IRR(Thanisandra road),7.0,1,,Adugodi
+others,High,Mysore Road,7.0,1,31.381574066666666,Kengeri
+others,High,ORR East 1,7.0,1,24.443889966666667,HAL Old Airport
+others,High,ORR North 1,7.0,1,,Hennuru
+others,High,Old Madras Road,7.0,1,,Halasur
+others,High,West of Chord Road,7.0,1,,Magadi Road
+others,Low,Non-corridor,2.0,0,531.4297273999999,No Police Station
+others,Medium,Airport New South Road,3.0,0,14652.471584683331,Hennuru
+others,Medium,Bannerghata Road,3.0,0,119.59072880000001,Hulimavu
+others,Medium,Bellary Road 1,3.0,0,296.06987986666667,Sadashivanagar
+others,Medium,Bellary Road 2,3.0,0,1534.3154997249999,Yelahanka
+others,Medium,CBD 1,3.0,0,,Shivajinagar
+others,Medium,CBD 2,3.0,0,187.27650548333335,Cubbon Park
+others,Medium,Hennur Main Road,3.0,0,7436.185964349999,Hennuru
+others,Medium,Hosur Road,3.0,0,422.50049320000005,Ashok Nagar
+others,Medium,IRR(Thanisandra road),3.0,0,26055.495738416666,Adugodi
+others,Medium,Magadi Road,3.0,0,143.69155221666668,Kamakshipalya
+others,Medium,Mysore Road,3.0,0,698.9426336333333,Byatarayanapura
+others,Medium,ORR East 1,3.0,0,2568.793783733333,HAL Old Airport
+others,Medium,ORR East 2,3.0,0,170.56828548333334,HAL Old Airport
+others,Medium,ORR North 1,3.0,0,29532.618213225003,Hennuru
+others,Medium,ORR North 2,3.0,0,205.8966446,Jalahalli
+others,Medium,ORR West 1,3.0,0,69.93633795000001,Banashankari
+others,Medium,Old Airport Road,3.0,0,4300.172757016667,HAL Old Airport
+others,Medium,Old Madras Road,3.0,0,75.93873236666667,Shivajinagar
+others,Medium,Tumkur Road,3.0,0,2246.6998243416665,Peenya
+others,Medium,Varthur Road,3.0,0,99.1271216,Whitefield
+others,Medium,West of Chord Road,3.0,0,1682.0687555833333,Vijayanagara
+pot_holes,Critical,Bellary Road 1,7.0,1,285.07037575,Kodigehalli
+pot_holes,Critical,CBD 2,7.0,1,4320.0,Cubbon Park
+pot_holes,Critical,Hennur Main Road,7.0,1,4320.0,K.G. Halli
+pot_holes,High,CBD 1,7.0,1,45.08455431666666,Shivajinagar
+pot_holes,Low,Non-corridor,2.0,0,4320.0,Hulimavu
+pot_holes,Medium,Airport New South Road,3.0,0,4320.0,Pulikeshinagar(F.Town)
+pot_holes,Medium,Bannerghata Road,3.0,0,4320.0,Hulimavu
+pot_holes,Medium,Bellary Road 1,3.0,0,4320.0,Sadashivanagar
+pot_holes,Medium,Bellary Road 2,3.0,0,4320.0,Chikkajala
+pot_holes,Medium,CBD 1,3.0,0,4320.0,Shivajinagar
+pot_holes,Medium,CBD 2,3.0,0,4320.0,Cubbon Park
+pot_holes,Medium,Hosur Road,3.0,0,4320.0,Madiwala
+pot_holes,Medium,IRR(Thanisandra road),3.0,0,,Adugodi
+pot_holes,Medium,Magadi Road,3.0,0,4320.0,Kamakshipalya
+pot_holes,Medium,Mysore Road,3.0,0,4320.0,Chamarajpet
+pot_holes,Medium,Non-corridor,3.0,0,4320.0,Byatarayanapura
+pot_holes,Medium,ORR East 1,3.0,0,2864.6436139999996,HAL Old Airport
+pot_holes,Medium,ORR East 2,3.0,0,,Mahadevapura
+pot_holes,Medium,ORR North 1,3.0,0,1872.6546038000001,Hennuru
+pot_holes,Medium,ORR North 2,3.0,0,4320.0,Kodigehalli
+pot_holes,Medium,ORR West 1,3.0,0,4320.0,J.P. Nagar
+pot_holes,Medium,Old Airport Road,3.0,0,2202.450937725,HAL Old Airport
+pot_holes,Medium,Old Madras Road,3.0,0,4320.0,Jeevanbheemanagar
+pot_holes,Medium,Tumkur Road,3.0,0,2352.4533704583337,Yeshwanthpura
+pot_holes,Medium,Varthur Road,3.0,0,4320.0,HAL Old Airport
+pot_holes,Medium,West of Chord Road,3.0,0,4320.0,Vijayanagara
+procession,High,Bellary Road 2,7.0,1,,Kodigehalli
+procession,High,Magadi Road,7.0,1,1.7318844333333334,Magadi Road
+procession,High,Mysore Road,7.0,1,,Cubbon Park
+procession,High,West of Chord Road,7.0,1,,Byatarayanapura
+procession,Low,Non-corridor,2.0,0,34.454523591666664,Yelahanka
+procession,Medium,Airport New South Road,3.0,0,,Pulikeshinagar(F.Town)
+procession,Medium,Bannerghata Road,3.0,0,,Mico Layout
+procession,Medium,Hennur Main Road,3.0,0,104.52003925000001,Hennuru
+procession,Medium,Hosur Road,3.0,0,,Madiwala
+procession,Medium,Magadi Road,3.0,0,120.45697526666666,Kamakshipalya
+procession,Medium,Mysore Road,3.0,0,,Chamarajpet
+protest,High,CBD 2,7.0,1,,Cubbon Park
+protest,Low,Non-corridor,4.0,1,18.243379033333333,R.T. Nagar
+protest,Medium,Mysore Road,3.0,0,30.6651656,Halasuru Gate
+protest,Medium,Old Airport Road,3.0,0,,HAL Old Airport
+protest,Medium,Tumkur Road,3.0,0,,Yeshwanthpura
+public_event,High,Bannerghata Road,7.0,1,,Thalagattapura
+public_event,High,Bellary Road 1,7.0,1,,High ground
+public_event,High,Hennur Main Road,7.0,1,,Hennuru
+public_event,High,Hosur Road,7.0,1,,Ashok Nagar
+public_event,High,Mysore Road,7.0,1,,Chamarajpet
+public_event,High,ORR East 1,7.0,1,,Bellandur
+public_event,High,ORR North 1,7.0,1,,Banaswadi
+public_event,High,ORR West 1,7.0,1,,K.S. Layout
+public_event,High,Old Airport Road,7.0,1,,Halasur
+public_event,High,Old Madras Road,7.0,1,,Halasur
+public_event,Low,Non-corridor,4.0,1,,Kamakshipalya
+public_event,Medium,Bellary Road 1,3.0,0,,High ground
+public_event,Medium,Bellary Road 2,3.0,0,,Chikkajala
+public_event,Medium,CBD 2,3.0,0,,Cubbon Park
+public_event,Medium,Hennur Main Road,3.0,0,,Hennuru
+public_event,Medium,Magadi Road,3.0,0,,Kamakshipalya
+public_event,Medium,Mysore Road,3.0,0,,Ashok Nagar
+public_event,Medium,Old Airport Road,3.0,0,,HAL Old Airport
+public_event,Medium,West of Chord Road,3.0,0,,Vijayanagara
+road_conditions,Critical,Airport New South Road,7.0,1,875.3519315,Hennuru
+road_conditions,Critical,Bellary Road 1,7.0,1,4320.0,Kodigehalli
+road_conditions,Critical,Mysore Road,7.0,1,3223.2303516666666,Halasuru Gate
+road_conditions,High,Bellary Road 2,7.0,1,58.722754933333334,Yelahanka
+road_conditions,High,CBD 2,7.0,1,,Cubbon Park
+road_conditions,High,Hennur Main Road,7.0,1,,Hennuru
+road_conditions,High,Magadi Road,7.0,1,,Kamakshipalya
+road_conditions,High,Mysore Road,7.0,1,,Chamarajpet
+road_conditions,High,ORR East 2,7.0,1,1.9296002833333332,HAL Old Airport
+road_conditions,High,Old Airport Road,7.0,1,,HAL Old Airport
+road_conditions,Low,Non-corridor,2.0,0,4320.0,K.R. Pura
+road_conditions,Medium,Airport New South Road,3.0,0,413.53389055,Hennuru
+road_conditions,Medium,Bannerghata Road,3.0,0,2180.632641675,J.P. Nagar
+road_conditions,Medium,Bellary Road 1,3.0,0,1080.0639681999999,Sadashivanagar
+road_conditions,Medium,Bellary Road 2,3.0,0,4320.0,Yelahanka
+road_conditions,Medium,CBD 2,3.0,0,4320.0,Cubbon Park
+road_conditions,Medium,Hennur Main Road,3.0,0,33.66901506666667,K.G. Halli
+road_conditions,Medium,Hosur Road,3.0,0,31.40482066666667,HSR Layout
+road_conditions,Medium,IRR(Thanisandra road),3.0,0,2273.161955725,Adugodi
+road_conditions,Medium,Magadi Road,3.0,0,4320.0,Kamakshipalya
+road_conditions,Medium,Mysore Road,3.0,0,2295.458973566667,Ashok Nagar
+road_conditions,Medium,ORR East 1,3.0,0,,HAL Old Airport
+road_conditions,Medium,ORR East 2,3.0,0,25.643229650000002,K.R. Pura
+road_conditions,Medium,ORR North 1,3.0,0,2854.5001905333334,K.G. Halli
+road_conditions,Medium,ORR North 2,3.0,0,2434.732365266667,Jalahalli
+road_conditions,Medium,ORR West 1,3.0,0,2942.351437608333,Banashankari
+road_conditions,Medium,Old Airport Road,3.0,0,773.9601677166667,Jeevanbheemanagar
+road_conditions,Medium,Old Madras Road,3.0,0,,Jeevanbheemanagar
+road_conditions,Medium,Varthur Road,3.0,0,4320.0,Whitefield
+road_conditions,Medium,West of Chord Road,3.0,0,4320.0,Magadi Road
+tree_fall,Critical,Bellary Road 1,7.0,1,971.1941217166666,High ground
+tree_fall,Critical,Hosur Road,7.0,1,5581.945785433333,Mico Layout
+tree_fall,Critical,Mysore Road,7.0,1,7640.408468199999,Chamarajpet
+tree_fall,Critical,ORR North 1,7.0,1,1460.2014964666666,Hebbala
+tree_fall,High,Airport New South Road,7.0,1,18.271439616666665,Pulikeshinagar(F.Town)
+tree_fall,High,Bannerghata Road,7.0,1,30.045177533333334,J.P. Nagar
+tree_fall,High,Bellary Road 1,7.0,1,20.54189726666667,Cubbon Park
+tree_fall,High,Bellary Road 2,7.0,1,,Hebbala
+tree_fall,High,CBD 2,7.0,1,,Cubbon Park
+tree_fall,High,Hosur Road,7.0,1,,Madiwala
+tree_fall,High,IRR(Thanisandra road),7.0,1,,Jeevanbheemanagar
+tree_fall,High,Magadi Road,7.0,1,91.44109088333333,Kamakshipalya
+tree_fall,High,ORR North 1,7.0,1,91.21919121666666,Banaswadi
+tree_fall,High,West of Chord Road,7.0,1,,Rajajinagar
+tree_fall,Low,Non-corridor,2.0,0,877.0059939083334,Jayanagara
+tree_fall,Medium,Airport New South Road,3.0,0,55.80160463333333,Banaswadi
+tree_fall,Medium,Bannerghata Road,3.0,0,,J.P. Nagar
+tree_fall,Medium,Bellary Road 1,3.0,0,1443.1942532166665,High ground
+tree_fall,Medium,CBD 1,3.0,0,,Shivajinagar
+tree_fall,Medium,CBD 2,3.0,0,16666.023908299998,Cubbon Park
+tree_fall,Medium,Hennur Main Road,3.0,0,,Yelahanka
+tree_fall,Medium,Hosur Road,3.0,0,62.19627536666667,Electronic City
+tree_fall,Medium,IRR(Thanisandra road),3.0,0,,Jeevanbheemanagar
+tree_fall,Medium,Magadi Road,3.0,0,9.963474483333332,Kamakshipalya
+tree_fall,Medium,Mysore Road,3.0,0,13203.4163744,Ashok Nagar
+tree_fall,Medium,ORR East 1,3.0,0,77.93821268333333,Bellandur
+tree_fall,Medium,ORR North 1,3.0,0,109.8635809,Banaswadi
+tree_fall,Medium,ORR West 1,3.0,0,72.61775473333334,Banashankari
+tree_fall,Medium,Old Madras Road,3.0,0,54.21143968333333,Halasur
+tree_fall,Medium,Tumkur Road,3.0,0,779.5622822666667,Yeshwanthpura
+tree_fall,Medium,West of Chord Road,3.0,0,114.29043176666667,Malleshwaram
+vehicle_breakdown,Critical,ORR North 1,7.0,1,130.6786535,Banaswadi
+vehicle_breakdown,High,Bannerghata Road,7.0,1,,Mico Layout
+vehicle_breakdown,High,Bellary Road 1,7.0,1,36.989145050000005,Kodigehalli
+vehicle_breakdown,High,Bellary Road 2,7.0,1,51.40784729166667,Yelahanka
+vehicle_breakdown,High,CBD 2,7.0,1,,Shivajinagar
+vehicle_breakdown,High,Hennur Main Road,7.0,1,31.50097945,Chikkajala
+vehicle_breakdown,High,Hosur Road,7.0,1,94.47238139999999,Ashok Nagar
+vehicle_breakdown,High,IRR(Thanisandra road),7.0,1,51.23013096666667,Jeevanbheemanagar
+vehicle_breakdown,High,Magadi Road,7.0,1,71.85437685833332,Kamakshipalya
+vehicle_breakdown,High,Mysore Road,7.0,1,28.56547880833333,Halasuru Gate
+vehicle_breakdown,High,ORR East 1,7.0,1,21.646528683333333,HSR Layout
+vehicle_breakdown,High,ORR East 2,7.0,1,,HAL Old Airport
+vehicle_breakdown,High,ORR North 1,7.0,1,,Banaswadi
+vehicle_breakdown,High,ORR North 2,7.0,1,54.64438441666667,Jalahalli
+vehicle_breakdown,High,ORR West 1,7.0,1,,Byatarayanapura
+vehicle_breakdown,High,Old Airport Road,7.0,1,14.23674055,Jeevanbheemanagar
+vehicle_breakdown,High,Old Madras Road,7.0,1,,Jeevanbheemanagar
+vehicle_breakdown,High,Tumkur Road,7.0,1,17.013469775,Yeshwanthpura
+vehicle_breakdown,High,Varthur Road,7.0,1,38.99701985,HAL Old Airport
+vehicle_breakdown,High,West of Chord Road,7.0,1,14.455940533333335,Byatarayanapura
+vehicle_breakdown,Low,Mysore Road,3.0,0,,Banashankari
+vehicle_breakdown,Low,Non-corridor,2.0,0,44.53869965,K.R. Pura
+vehicle_breakdown,Low,Tumkur Road,2.0,0,,Jnanabharathi
+vehicle_breakdown,Medium,Airport New South Road,3.0,0,59.60447345833333,Hennuru
+vehicle_breakdown,Medium,Bannerghata Road,3.0,0,34.15102665,Mico Layout
+vehicle_breakdown,Medium,Bellary Road 1,3.0,0,36.68353725833333,Sadashivanagar
+vehicle_breakdown,Medium,Bellary Road 2,3.0,0,43.808987275,Yelahanka
+vehicle_breakdown,Medium,CBD 1,3.0,0,44.654022250000004,Shivajinagar
+vehicle_breakdown,Medium,CBD 2,3.0,0,53.88951821666667,Cubbon Park
+vehicle_breakdown,Medium,Hennur Main Road,3.0,0,50.382559799999996,Hennuru
+vehicle_breakdown,Medium,Hosur Road,3.0,0,47.869475791666666,Madiwala
+vehicle_breakdown,Medium,IRR(Thanisandra road),3.0,0,31.563106291666664,Adugodi
+vehicle_breakdown,Medium,Magadi Road,3.0,0,43.246951675,Kamakshipalya
+vehicle_breakdown,Medium,Mysore Road,3.0,0,38.7856253,Byatarayanapura
+vehicle_breakdown,Medium,Non-corridor,3.0,0,1.7176543333333332,Ashok Nagar
+vehicle_breakdown,Medium,ORR East 1,3.0,0,40.19319646666666,HAL Old Airport
+vehicle_breakdown,Medium,ORR East 2,3.0,0,31.545336366666668,HAL Old Airport
+vehicle_breakdown,Medium,ORR North 1,3.0,0,36.730649516666666,Banaswadi
+vehicle_breakdown,Medium,ORR North 2,3.0,0,36.75914435,Jalahalli
+vehicle_breakdown,Medium,ORR West 1,3.0,0,51.137137599999996,Banashankari
+vehicle_breakdown,Medium,Old Airport Road,3.0,0,63.47326641666667,Jeevanbheemanagar
+vehicle_breakdown,Medium,Old Madras Road,3.0,0,35.63385138333333,Banaswadi
+vehicle_breakdown,Medium,Tumkur Road,3.0,0,30.63011775,Yeshwanthpura
+vehicle_breakdown,Medium,Varthur Road,3.0,0,48.833487266666666,HAL Old Airport
+vehicle_breakdown,Medium,West of Chord Road,3.0,0,33.866701383333336,Byatarayanapura
+vip_movement,High,Mysore Road,7.0,1,,Kengeri
+vip_movement,High,Old Airport Road,7.0,1,,HAL Old Airport
+vip_movement,Low,Non-corridor,4.0,1,,No Police Station
+vip_movement,Medium,Mysore Road,3.0,0,,City Market
+water_logging,Critical,Hosur Road,7.0,1,5282.47767055,Ashok Nagar
+water_logging,Critical,Mysore Road,7.0,1,19050.433755675,Chamarajpet
+water_logging,Critical,Old Madras Road,7.0,1,201.7505084166667,Ashok Nagar
+water_logging,Critical,West of Chord Road,7.0,1,56508.9407717,Rajajinagar
+water_logging,High,Bannerghata Road,7.0,1,,J.P. Nagar
+water_logging,High,Bellary Road 1,7.0,1,,High ground
+water_logging,High,Mysore Road,7.0,1,56.250664216666664,Halasuru Gate
+water_logging,High,Varthur Road,7.0,1,,Whitefield
+water_logging,Low,Non-corridor,2.0,0,2860.77638925,Halasur
+water_logging,Medium,Airport New South Road,3.0,0,,Hennuru
+water_logging,Medium,Bannerghata Road,3.0,0,5883.57713725,Mico Layout
+water_logging,Medium,Bellary Road 1,3.0,0,1461.7091233166668,Sadashivanagar
+water_logging,Medium,Bellary Road 2,3.0,0,11607.6318496,Yelahanka
+water_logging,Medium,CBD 1,3.0,0,24578.588871991666,Shivajinagar
+water_logging,Medium,CBD 2,3.0,0,38463.541784341665,Cubbon Park
+water_logging,Medium,Hennur Main Road,3.0,0,21523.703026233336,Hennuru
+water_logging,Medium,Hosur Road,3.0,0,1494.82234955,HSR Layout
+water_logging,Medium,IRR(Thanisandra road),3.0,0,53354.217873333335,Ashok Nagar
+water_logging,Medium,Magadi Road,3.0,0,5854.4128154166665,Kamakshipalya
+water_logging,Medium,Mysore Road,3.0,0,5642.4267250249995,Chamarajpet
+water_logging,Medium,ORR East 1,3.0,0,3688.3307549166666,HAL Old Airport
+water_logging,Medium,ORR East 2,3.0,0,9545.402302191667,Mahadevapura
+water_logging,Medium,ORR North 1,3.0,0,991.0599979333333,Banaswadi
+water_logging,Medium,ORR North 2,3.0,0,8628.97539755,Kodigehalli
+water_logging,Medium,ORR West 1,3.0,0,3321.72448815,J.P. Nagar
+water_logging,Medium,Old Airport Road,3.0,0,11640.880725683333,HAL Old Airport
+water_logging,Medium,Old Madras Road,3.0,0,56.98196715,Cubbon Park
+water_logging,Medium,Tumkur Road,3.0,0,1345.3929395666667,Yeshwanthpura
+water_logging,Medium,Varthur Road,3.0,0,4336.9783851,Whitefield
+water_logging,Medium,West of Chord Road,3.0,0,10316.061039908333,Malleshwaram
