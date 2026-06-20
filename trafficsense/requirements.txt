@@ -1,5 +1,7 @@
 pandas
 numpy
+matplotlib
+seaborn
 scikit-learn
 xgboost
 lightgbm
@@ -20,3 +22,8 @@ pytest
 httpx
 joblib
 python-multipart
+requests
+google-generativeai
+groq
+python-dotenv
+uvicorn
