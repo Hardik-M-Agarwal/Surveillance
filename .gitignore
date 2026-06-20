@@ -37,3 +37,4 @@ data/raw/*
 data/processed/*
 models/*.pkl
 .env
+trafficsense/.streamlit/secrets.toml
