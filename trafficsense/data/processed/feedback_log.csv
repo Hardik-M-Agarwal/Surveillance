@@ -1,0 +1,2 @@
+timestamp,incident_id,event_cause,corridor,predicted_severity,actual_severity,predicted_duration,actual_duration,predicted_constables,actual_constables,predicted_closure,actual_closure,notes
+2026-06-21T14:26:53.837860,abcd,tree_fall,Tumkur Road,Low,Medium,45,45,3,3,True,True,

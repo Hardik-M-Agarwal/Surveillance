@@ -40,7 +40,7 @@ SEV_COLOR = {
 PLOTLY = dict(
     paper_bgcolor="rgba(255,255,255,0)",
     plot_bgcolor="rgba(248,249,251,0.6)",
-    font=dict(color="#111827", family="'Inter', -apple-system, sans-serif"),
+    font=dict(color="#111827", size=12, family="'Inter', -apple-system, sans-serif"),
     colorway=["#1a56db","#b45309","#b91c1c","#15803d","#6d28d9","#0891b2","#ea580c"],
 )
 AXIS_STYLE   = dict(gridcolor="#e5e7eb", linecolor="#d1d5db",
