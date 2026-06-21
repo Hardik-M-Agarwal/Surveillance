@@ -13,7 +13,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from folium.plugins import HeatMap
-from streamlit_folium import st_folium
+import streamlit.components.v1 as stc
 import plotly.graph_objects as go
 
 from utils.theme import (apply_theme, sidebar_brand, page_header,
@@ -484,7 +484,7 @@ with col_map:
         </div>
     </div>"""))
 
-    st_folium(m, height=500, use_container_width=True)
+    stc.html(m._repr_html_(), height=500, scrolling=False)
 
 # ── SHIFT DEPLOYMENT BRIEF ─────────────────────────────────────────────────────
 with col_brief:

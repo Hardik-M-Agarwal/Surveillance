@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 from datetime import datetime
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from api.schemas import EventInput, PredictionResponse
@@ -7,46 +8,91 @@ from src.feature_engineering import FeatureEngineer
 
 router = APIRouter()
 
+# ── Precompute corridor/hour density look-ups from the cleaned dataset ─────────
+_DENSITY_CACHE: dict = {}
+_STATION_DUR_CACHE: dict = {}
+
+def _build_density_cache():
+    """Load historical stats once at startup; called lazily on first request."""
+    global _DENSITY_CACHE, _STATION_DUR_CACHE
+    cleaned = Path("data/processed/cleaned.csv")
+    if not cleaned.exists():
+        return
+    df = pd.read_csv(cleaned, low_memory=False,
+                     usecols=lambda c: c in [
+                         "corridor", "hour", "police_station", "event_cause",
+                         "duration_minutes", "start_datetime",
+                     ])
+    df["start_datetime"] = pd.to_datetime(df["start_datetime"], utc=True, errors="coerce")
+    df["hour"] = df["start_datetime"].dt.hour
+    df["month"] = df["start_datetime"].dt.month
+    df["duration_minutes"] = pd.to_numeric(df["duration_minutes"], errors="coerce")
+
+    # Per-corridor-hour 30-day density proxy: incidents per hour (global rate)
+    density = (df.groupby(["corridor", "hour"])
+                 .size()
+                 .reset_index(name="count"))
+    total_days = max((df["start_datetime"].max() - df["start_datetime"].min()).days, 1)
+    density["density_30d"] = density["count"] / (total_days / 30)
+    for _, row in density.iterrows():
+        _DENSITY_CACHE[(row["corridor"], int(row["hour"]))] = float(row["density_30d"])
+
+    # Per (police_station, event_cause) median duration
+    for (ps, ec), grp in df.groupby(["police_station", "event_cause"]):
+        med = grp["duration_minutes"].dropna().median()
+        if not pd.isna(med):
+            _STATION_DUR_CACHE[(str(ps), str(ec))] = float(med)
+
+    global_med = df["duration_minutes"].dropna().median()
+    _STATION_DUR_CACHE["__global__"] = float(global_med) if not pd.isna(global_med) else 60.0
+
 @router.post("/predict", response_model=PredictionResponse)
 async def predict(request: Request, event: EventInput):
     app = request.app
-    
+
+    # Ensure density cache is populated
+    if not _DENSITY_CACHE:
+        _build_density_cache()
+
     # 1. Prepare input dataframe
     input_dict = event.dict()
-    # Add dummy/default fields needed for feature engineering
-    input_dict['start_datetime'] = pd.Timestamp.utcnow() # not strictly needed if we just mock the temporal feats
-    
+    input_dict['start_datetime'] = pd.Timestamp.utcnow()
+
     df = pd.DataFrame([input_dict])
-    
-    # Mock some fields for FeatureEngineer if they are needed and missing
-    # Actually FeatureEngineer uses hour, day_of_week, etc. directly.
-    # Let's run a simplified feature extraction for inference.
     fe = FeatureEngineer()
-    
+
     # Temporal
-    df['hour'] = event.hour
+    df['hour']        = event.hour
     df['day_of_week'] = event.day_of_week
-    df['is_weekend'] = 1 if event.day_of_week >= 5 else 0
-    df['month'] = datetime.now().month
+    df['is_weekend']  = 1 if event.day_of_week >= 5 else 0
+    df['month']       = datetime.now().month
     if event.is_peak_hour is not None:
         df['is_peak_hour'] = event.is_peak_hour
     else:
         df['is_peak_hour'] = 1 if event.hour in [19, 20, 21, 22, 4, 5, 6] else 0
-        
+
     # Categoricals target encode
     df = fe.encode_categoricals(df, is_train=False)
-    
+
     # Distance / Hotspot
-    df['junction'] = 'unknown' # Assume unknown unless provided
-    df['displacement_km'] = 0.0 # Unknown at start
+    df['junction']         = 'unknown'
+    df['displacement_km']  = 0.0
     df['is_junction_hotspot'] = 0
-    
-    # Historical density & saturation - since we don't have access to the whole active DB here easily,
-    # we will use the median/mean from the lookup or use a default
-    # A real system would query the active DB.
-    df['historical_density_30d'] = 10.0 # Default fallback
-    df['corridor_active_count'] = 1     # Default fallback
-    df['station_cause_avg_duration'] = 60.0 # Default fallback
+
+    # ── Real historical density from cache (replaces hardcoded 10.0) ──────────
+    density_key = (event.corridor, int(event.hour))
+    df['historical_density_30d'] = _DENSITY_CACHE.get(density_key,
+                                   _DENSITY_CACHE.get((event.corridor, event.hour), 5.0))
+
+    # corridor_active_count: incidents on same corridor within 2-hour window
+    # Use density as proxy (active incidents ≈ density × 2-hr window)
+    df['corridor_active_count'] = max(1, int(df['historical_density_30d'].iloc[0] * 2))
+
+    # station_cause_avg_duration from cache
+    dur_key = (str(event.police_station), str(event.event_cause))
+    df['station_cause_avg_duration'] = _STATION_DUR_CACHE.get(
+        dur_key, _STATION_DUR_CACHE.get("__global__", 60.0)
+    )
     
     # Get final columns
     with open('models/feature_columns.json', 'r') as f:

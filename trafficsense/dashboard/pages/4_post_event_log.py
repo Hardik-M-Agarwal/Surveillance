@@ -25,7 +25,7 @@ with st.sidebar:
     sidebar_brand()
 
 LOG_FILE = ROOT / "data" / "processed" / "feedback_log.csv"
-MIN_FEEDBACK   = 50   # incidents needed to trigger retraining
+MIN_FEEDBACK   = 5    # incidents needed to trigger retraining cycle
 RETRAIN_THRESH = 15.0  # % MAE degradation threshold
 
 COLS = [
@@ -119,9 +119,9 @@ def _build_banner(n_needed, cycle_color, n_logged, MIN_FEEDBACK, pct_done,
         '</div>',
 
         '<div style="text-align:center;flex-shrink:0;background:#f8fafc;border-radius:10px;padding:10px 18px;">',
-        '<div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Next Retrain</div>',
-        '<div style="font-size:13px;font-weight:700;color:#111827;">Sunday 02:00</div>',
-        '<div style="font-size:10px;color:#9ca3af;margin-top:1px;">Trigger: &gt;' + str(int(RETRAIN_THRESH)) + '% MAE drift</div>',
+        '<div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Retrain Trigger</div>',
+        '<div style="font-size:13px;font-weight:700;color:' + ('#15803d' if pct_done >= 100 else '#111827') + ';">' + ('✅ Ready' if pct_done >= 100 else str(MIN_FEEDBACK - n_logged) + ' more incidents') + '</div>',
+        '<div style="font-size:10px;color:#9ca3af;margin-top:1px;">Trigger: ' + str(MIN_FEEDBACK) + ' incidents logged</div>',
         '</div>',
 
         '</div>',
@@ -499,6 +499,71 @@ with col_analytics:
                             {"—" if np.isnan(dm) else f"{dm:.0f} min"}</div>
                     </div>
                     """, unsafe_allow_html=True)
+
+        # ── Learning Curve + Retrain Trigger ──────────────────────────────────
+        if n_logged >= MIN_FEEDBACK:
+            section_header("Model Learning — Cumulative Accuracy Trend", "📈")
+
+            # Compute rolling accuracy as more incidents are logged
+            sorted_log = log_df.sort_values("timestamp").reset_index(drop=True)
+            cumulative_acc = []
+            for i in range(1, len(sorted_log) + 1):
+                window  = sorted_log.iloc[:i]
+                acc     = (window["predicted_severity"] == window["actual_severity"]).mean() * 100
+                dur_err = (window["actual_duration"] - window["predicted_duration"]).abs().mean()
+                cumulative_acc.append({"n": i, "sev_acc": acc, "dur_mae": dur_err})
+            cum_df = pd.DataFrame(cumulative_acc)
+
+            fig_lc = go.Figure()
+            fig_lc.add_trace(go.Scatter(
+                x=cum_df["n"], y=cum_df["sev_acc"],
+                name="Severity Accuracy",
+                mode="lines+markers",
+                line=dict(color=C["success"], width=2.5),
+                marker=dict(size=7, color=C["success"],
+                            line=dict(color="#fff", width=1.5)),
+                hovertemplate="After %{x} logs: Severity accuracy = %{y:.1f}%<extra></extra>",
+            ))
+            fig_lc.add_hline(y=80, line=dict(color=C["success"], dash="dot", width=1),
+                             annotation_text="80% target",
+                             annotation_position="top right",
+                             annotation_font=dict(color=C["success"], size=10))
+            fig_lc.update_layout(
+                **PLOTLY, height=230,
+                margin=dict(l=55, r=30, t=44, b=50),
+                title=dict(
+                    text="Severity prediction accuracy as more real outcomes are logged",
+                    font=dict(size=12, color="#6b7280"), x=0, xanchor="left",
+                ),
+                xaxis=dict(gridcolor="#e5e7eb", linecolor="#d1d5db",
+                           title="Number of incidents logged",
+                           tickfont=dict(color="#111827"),
+                           title_font=dict(color="#111827", size=12)),
+                yaxis=dict(gridcolor="#e5e7eb", linecolor="#d1d5db",
+                           title="Severity Accuracy (%)", range=[0, 105],
+                           tickfont=dict(color="#111827"),
+                           title_font=dict(color="#111827", size=12)),
+            )
+            st.plotly_chart(fig_lc, config={"displayModeBar": False},
+                            use_container_width=True)
+
+            # Retrain-ready call-to-action
+            final_acc = cum_df["sev_acc"].iloc[-1]
+            st.markdown(f"""
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;
+                        padding:14px 18px;margin-top:4px;">
+                <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:6px;">
+                    ✅ Retraining Threshold Reached — {n_logged} incidents logged
+                </div>
+                <div style="font-size:12px;color:#374151;line-height:1.8;">
+                    Current field-validated severity accuracy: <b>{final_acc:.0f}%</b>.
+                    The feedback dataset is ready to be merged with the historical training
+                    corpus to retrain the XGBoost severity and LightGBM duration/closure models.
+                    Run <code>python run_pipeline.py --retrain-with-feedback</code> to trigger
+                    the full retraining cycle.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
         # ── Recent log table ───────────────────────────────────────────────────
         section_header("Recent Feedback Entries", "🗂️")

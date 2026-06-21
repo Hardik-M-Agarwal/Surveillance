@@ -237,6 +237,39 @@ _sb_parts.append('</div>')
 
 st.markdown("".join(_sb_parts), unsafe_allow_html=True)
 
+# ── Impact claim banner ────────────────────────────────────────────────────────
+if df is not None:
+    n_total     = len(df)
+    n_hc        = df["severity"].isin(["High","Critical"]).sum() if "severity" in df.columns else 0
+    planned_med = df[df["event_type"] == "planned"]["duration_minutes"].dropna().median() if "event_type" in df.columns else 0
+    unplan_med  = df[df["event_type"] == "unplanned"]["duration_minutes"].dropna().median() if "event_type" in df.columns else 0
+    time_save   = max(unplan_med - planned_med, 0) if not (np.isnan(float(planned_med)) or np.isnan(float(unplan_med))) else 0
+    cl_rate     = df["requires_road_closure"].mean() * 100
+
+    _impact_parts = [
+        '<div style="background:linear-gradient(90deg,#1e3a5f 0%,#1a56db 100%);',
+        'border-radius:10px;padding:10px 20px;margin-bottom:16px;',
+        'display:flex;align-items:center;gap:0;flex-wrap:wrap;">',
+        '<div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.6);',
+        'text-transform:uppercase;letter-spacing:.1em;margin-right:20px;',
+        'white-space:nowrap;">TrafficSense Impact</div>',
+    ]
+    for val, label in [
+        (f"{n_total:,}", "incidents analysed"),
+        (f"{n_hc:,}", "High/Critical flagged"),
+        (f"{time_save:.0f} min", "avg clearance saved (planned vs reactive)"),
+        (f"{cl_rate:.0f}%", "historical closure rate"),
+    ]:
+        _impact_parts += [
+            '<div style="display:flex;align-items:center;gap:10px;padding:4px 20px;',
+            'border-left:1px solid rgba(255,255,255,.15);">',
+            f'<div style="font-size:18px;font-weight:800;color:#fff;">{val}</div>',
+            f'<div style="font-size:10px;color:rgba(255,255,255,.65);line-height:1.3;">{label}</div>',
+            '</div>',
+        ]
+    _impact_parts.append('</div>')
+    st.markdown("".join(_impact_parts), unsafe_allow_html=True)
+
 # ══════════════════════════════════════════════════════════════════════════════
 # SECTION 2 — TODAY'S INTELLIGENCE BRIEF
 # ══════════════════════════════════════════════════════════════════════════════

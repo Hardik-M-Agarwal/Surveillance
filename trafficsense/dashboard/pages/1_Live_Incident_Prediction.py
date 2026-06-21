@@ -9,7 +9,7 @@ import requests
 import pandas as pd
 import plotly.graph_objects as go
 import folium
-from streamlit_folium import st_folium
+import streamlit.components.v1 as stc
 
 from utils.theme import (apply_theme, sidebar_brand, alert_html, kpi_card,
                          rec_card, section_header, C, PLOTLY, SEV_COLOR,
@@ -66,6 +66,62 @@ VEH_TYPES = ["unknown","bmtc_bus","heavy_vehicle","lcv","others","private_bus",
 # ── Page header ───────────────────────────────────────────────────────────────
 page_header("⚡", "Live Incident Prediction",
             "Officer intake → ML severity · duration · closure · resource deployment")
+
+# ── Quick Demo Scenarios ───────────────────────────────────────────────────────
+DEMO_SCENARIOS = {
+    "🎪 Public Rally — Hosur Road · Fri 19:00":      dict(event_cause="public_event",   corridor="Hosur Road",       event_type="planned",   priority="High", hour=19, day_of_week=4, veh_type="bmtc_bus",       police_station="Madiwala"),
+    "👔 VIP Movement — Bellary Road 1 · Mon 08:00":  dict(event_cause="vip_movement",   corridor="Bellary Road 1",   event_type="planned",   priority="High", hour=8,  day_of_week=0, veh_type="private_car",     police_station="Hebbal"),
+    "💥 Accident — Silk Board · Fri 18:30":          dict(event_cause="accident",        corridor="Hosur Road",       event_type="unplanned", priority="High", hour=18, day_of_week=4, veh_type="heavy_vehicle",   police_station="Madiwala"),
+    "✊ Protest — Tumkur Road · Wed 11:00":          dict(event_cause="protest",         corridor="Tumkur Road",      event_type="unplanned", priority="High", hour=11, day_of_week=2, veh_type="others",          police_station="Yeshwanthapura"),
+    "🚧 Construction — ORR East 1 · Tue 09:00":     dict(event_cause="construction",    corridor="ORR East 1",       event_type="planned",   priority="Low",  hour=9,  day_of_week=1, veh_type="truck",           police_station="K R Puram"),
+    "🚗 Breakdown — Mysore Road · Sat 22:00":        dict(event_cause="vehicle_breakdown", corridor="Mysore Road",    event_type="unplanned", priority="Low",  hour=22, day_of_week=5, veh_type="heavy_vehicle",   police_station="Byatarayanapura"),
+}
+
+st.markdown("""
+<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
+            padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:13px;">🚀</span>
+    <span style="font-size:12px;font-weight:700;color:#1a56db;">Quick Demo</span>
+    <span style="font-size:12px;color:#374151;">— Select a pre-set scenario to run instantly</span>
+</div>
+""", unsafe_allow_html=True)
+
+demo_cols = st.columns(3)
+for i, (label, params) in enumerate(DEMO_SCENARIOS.items()):
+    with demo_cols[i % 3]:
+        if st.button(label, use_container_width=True, key=f"demo_{i}"):
+            lat, lon = CORRIDOR_COORDS.get(params["corridor"], (12.9716, 77.5946))
+            payload  = {"event_type": params["event_type"],
+                        "event_cause": params["event_cause"],
+                        "latitude": lat, "longitude": lon,
+                        "corridor": params["corridor"],
+                        "police_station": params["police_station"],
+                        "hour": params["hour"], "day_of_week": params["day_of_week"],
+                        "veh_type": params["veh_type"], "priority": params["priority"]}
+            event_ctx = {"event_cause": params["event_cause"],
+                         "corridor": params["corridor"],
+                         "hour": params["hour"], "event_type": params["event_type"]}
+            with st.spinner(f"Running ML pipeline for demo scenario…"):
+                try:
+                    res  = requests.post("http://127.0.0.1:8000/predict",
+                                         json=payload, timeout=10)
+                    data = res.json() if res.status_code == 200 else None
+                    err  = None
+                except Exception as e:
+                    data, err = None, str(e)
+            if data:
+                weather_data = weather_for_corridor(params["corridor"])
+                report       = generate_situation_report(data, event_ctx, weather_data)
+                st.session_state.pred_data    = data
+                st.session_state.pred_ctx     = event_ctx
+                st.session_state.pred_weather = weather_data
+                st.session_state.pred_report  = report
+                st.session_state.pred_error   = None
+            else:
+                st.session_state.pred_error = err or "API returned an error"
+            st.rerun()
+
+st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
 
 # Weather banner — full width, always visible above the form
 ctx_corridor = (st.session_state.pred_ctx or {}).get("corridor", "Non-corridor")
@@ -263,6 +319,80 @@ with col_result:
             st.markdown(rec_card("📍", "Station", rec["suggested_police_station"],
                                  conf_colors.get(rec["confidence"], C["muted"])),
                         unsafe_allow_html=True)
+
+        # ── SHAP Feature Importance ───────────────────────────────────────────
+        section_header("Why This Prediction? — SHAP Feature Importance", "🔍")
+
+        shap_items = [e for e in (data.get("explanation") or []) if "feature" in e]
+        shap_text  = next(
+            (e.get("text", "") for e in (data.get("explanation") or []) if "text" in e), ""
+        )
+
+        if shap_items:
+            feat_labels = [
+                e["feature"].replace("_encoded", "").replace("_", " ").title()
+                for e in shap_items
+            ]
+            impacts     = [e["impact"] for e in shap_items]
+            bar_colors  = ["#b91c1c" if v > 0 else "#1a56db" for v in impacts]
+
+            fig_shap = go.Figure(go.Bar(
+                x=impacts,
+                y=feat_labels,
+                orientation="h",
+                marker_color=bar_colors,
+                marker_line_width=0,
+                text=[f"{'+'if v>0 else ''}{v:.3f}" for v in impacts],
+                textposition="outside",
+                textfont=dict(size=11, color="#374151"),
+                hovertemplate="<b>%{y}</b><br>SHAP: %{x:.4f}<extra></extra>",
+            ))
+            fig_shap.update_layout(
+                **PLOTLY,
+                height=210,
+                margin=dict(l=10, r=80, t=36, b=30),
+                title=dict(
+                    text="Top features driving this severity prediction",
+                    font=dict(size=12, color="#111827"),
+                    x=0, xanchor="left",
+                ),
+                xaxis=dict(
+                    gridcolor="#e5e7eb", linecolor="#d1d5db",
+                    tickfont=dict(color="#374151"),
+                    title_font=dict(color="#374151"),
+                    zeroline=True, zerolinecolor="#d1d5db", zerolinewidth=1.5,
+                    title="SHAP Value",
+                ),
+                yaxis=dict(
+                    gridcolor="rgba(0,0,0,0)", linecolor="#d1d5db",
+                    tickfont=dict(color="#374151", size=11), automargin=True,
+                ),
+            )
+
+            sh_chart, sh_legend = st.columns([2, 1])
+            with sh_chart:
+                st.plotly_chart(fig_shap,
+                                config={"displayModeBar": False},
+                                use_container_width=True)
+            with sh_legend:
+                st.markdown(f"""
+                <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;
+                            padding:13px 15px;margin-top:6px;font-size:12px;color:#374151;
+                            line-height:1.8;">
+                    <div style="font-weight:700;color:#111827;margin-bottom:8px;">Reading this:</div>
+                    <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+                        <div style="width:11px;height:11px;background:#b91c1c;
+                                    border-radius:2px;flex-shrink:0;"></div>
+                        <span>Pushes toward <b>higher</b> severity</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+                        <div style="width:11px;height:11px;background:#1a56db;
+                                    border-radius:2px;flex-shrink:0;"></div>
+                        <span>Pushes toward <b>lower</b> severity</span>
+                    </div>
+                    {f'<div style="padding:8px;background:#eff6ff;border-radius:7px;font-size:11px;color:#1a56db;line-height:1.7;">{shap_text}</div>' if shap_text else ""}
+                </div>
+                """, unsafe_allow_html=True)
 
         # AI Situation Report
         section_header("AI Situation Report", "🤖")
@@ -488,7 +618,7 @@ with col_result:
             </div>
         '''))
 
-        st_folium(tac_map, height=400, use_container_width=True)
+        stc.html(tac_map._repr_html_(), height=400, scrolling=False)
 
         # Quick legend note below map
         if diversion_needed:

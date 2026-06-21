@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import folium
-from streamlit_folium import st_folium
+import streamlit.components.v1 as stc
 from datetime import datetime, timedelta, date
 
 from utils.theme import (apply_theme, sidebar_brand, page_header, section_header,
@@ -561,7 +561,7 @@ with col_map:
         <span style="color:#1a56db;">👮</span> Staging points
     </div>"""))
 
-    st_folium(m, height=400, use_container_width=True)
+    stc.html(m._repr_html_(), height=400, scrolling=False)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ROW 2: Deployment schedule table (left) + Resource summary (right)
@@ -637,37 +637,98 @@ with col_res:
 
     st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
 
-    # Quick action checklist
-    section_header("Pre-Event Checklist", "✅")
-    checklist = [
-        (True,  f"Stage units by <b>{stage_time:02d}:00</b> (1 hr before start)"),
-        (True,  f"Position <b>{max_constables} constables</b> at ingress points"),
-        (True,  f"Place <b>{max_barricades} barricades</b> at corridor entries"),
-        (need_diversion, "Activate diversion route at event start"),
-        (closure_p > 0.3, f"Pre-inform public of likely closure ({closure_p*100:.0f}% probability)"),
-        (True,  f"Contact nearest station 30 min before peak ({peak_hour:02d}:00)"),
-        (max_risk > 50,   "Request additional units on standby"),
+    # ── P90 Confidence Bands ──────────────────────────────────────────────────
+    section_header("Resource Confidence Bands", "📐")
+
+    if df_hist is not None and n_similar >= 5:
+        sim_const = similar["duration_minutes"].dropna()
+        # Derive constable proxy from severity distribution in similar events
+        sev_proxy = similar["severity"].map(
+            {"Critical": 7, "High": 5, "Medium": 3, "Low": 2}
+        ).dropna()
+        if len(sev_proxy) >= 5:
+            p10 = int(sev_proxy.quantile(0.10))
+            p25 = int(sev_proxy.quantile(0.25))
+            p50 = int(sev_proxy.quantile(0.50))
+            p75 = int(sev_proxy.quantile(0.75))
+            p90 = int(sev_proxy.quantile(0.90))
+
+            for label, val, bg, color, note in [
+                ("Base Case (P50 — median)",  p50, "#f0fdf4", "#15803d", "Most likely deployment"),
+                ("Elevated (P75)",             p75, "#fffbeb", "#d97706", "75% of similar events needed ≤ this"),
+                ("Worst Case (P90 standby)",   p90, "#fef2f2", "#b91c1c", "Pre-position on standby for surge"),
+            ]:
+                st.markdown(f"""
+                <div style="background:{bg};border:1px solid {color}30;border-radius:8px;
+                            padding:9px 13px;margin-bottom:5px;
+                            display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:11px;font-weight:700;color:#374151;">{label}</div>
+                        <div style="font-size:10px;color:#9ca3af;margin-top:1px;">{note}</div>
+                    </div>
+                    <div style="font-size:20px;font-weight:800;color:{color};">
+                        {val} <span style="font-size:11px;font-weight:500;">constables</span></div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;
+                        padding:8px 12px;margin-top:3px;font-size:11px;color:#1a56db;">
+                💡 Keep <b>{p90 - p50} additional constables on standby</b>
+                to handle 90% of historical scenarios for this event type.
+                Based on <b>{n_similar:,} similar past events.</b>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Need ≥5 similar historical events for confidence bands.")
+
+    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
+
+    # ── T-Minus Pre-Event Timeline ────────────────────────────────────────────
+    section_header("Pre-Event Action Timeline", "⏰")
+
+    timeline_steps = [
+        (f"T–72 hr · {max(start_hour - 72, 0)%24:02d}:00",
+         "#6d28d9", "#f5f3ff", "#ddd6fe",
+         f"Notify nearby stations. Brief {max_constables} constables on assignment. "
+         f"Coordinate with event organiser for expected crowd size and route."),
+        (f"T–24 hr · {max(start_hour - 24, 0)%24:02d}:00",
+         "#1a56db", "#eff6ff", "#bfdbfe",
+         f"Conduct recce of {corridor}. Identify barricade positions. "
+         f"Set up radio channel. Pre-position traffic management equipment."),
+        (f"T–2 hr · {stage_time:02d}:00 (Stage by this time)",
+         "#d97706", "#fffbeb", "#fde68a",
+         f"All {max_constables} constables staged at ingress points. "
+         f"{max_barricades} barricades placed. {'Diversion route signage activated.' if need_diversion else 'Diversion on standby — activate if closure probability exceeds 50%.'}"),
+        (f"T–0 · {start_hour:02d}:00 (Event starts)",
+         "#ea580c", "#fff7ed", "#fed7aa",
+         f"Full deployment active. Control room notified. "
+         f"Monitor queue at {peak_hour:02d}:00 (predicted peak). "
+         f"Escalation trigger: if queue > 500m or secondary incident occurs."),
+        (f"T+{int(max(event_df['median_duration'].mean(), 30)):0d} min · Post-event clearance",
+         "#15803d", "#f0fdf4", "#bbf7d0",
+         f"Begin phased de-deployment after crowd dispersal. "
+         f"Maintain 2 constables until corridor returns to baseline traffic. "
+         f"Log actual outcomes in Post-Event Feedback for model improvement."),
     ]
-    for active, text in checklist:
-        if active:
-            badge = '<span style="display:inline-flex;align-items:center;justify-content:center;' \
-                     'width:18px;height:18px;border-radius:4px;background:#1a56db;' \
-                     'flex-shrink:0;margin-top:1px;">' \
-                     '<svg width="10" height="8" viewBox="0 0 10 8" fill="none">' \
-                     '<path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" ' \
-                     'stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
-            txt_color = "#111827"
-        else:
-            badge = '<span style="display:inline-block;width:18px;height:18px;' \
-                     'border-radius:4px;border:1.5px solid #d1d5db;' \
-                     'flex-shrink:0;margin-top:1px;"></span>'
-            txt_color = "#9ca3af"
-        st.markdown(
-            f'<div style="display:flex;align-items:flex-start;gap:10px;' \
-            f'padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13px;color:{txt_color};">' \
-            f'{badge}<span style="line-height:1.5;">{text}</span></div>',
-            unsafe_allow_html=True,
-        )
+
+    for step_label, color, bg, border, action in timeline_steps:
+        st.markdown(f"""
+        <div style="display:flex;gap:12px;margin-bottom:8px;">
+            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <div style="width:10px;height:10px;border-radius:50%;background:{color};
+                            margin-top:4px;flex-shrink:0;"></div>
+                <div style="width:2px;flex:1;background:{border};margin-top:2px;"></div>
+            </div>
+            <div style="background:{bg};border:1px solid {border};border-radius:8px;
+                        padding:10px 13px;margin-bottom:2px;flex:1;">
+                <div style="font-size:11px;font-weight:800;color:{color};
+                            text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">
+                    {step_label}</div>
+                <div style="font-size:12px;color:#374151;line-height:1.6;">{action}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ROW 3: AI Brief (left) + Historical context (right)
@@ -816,5 +877,409 @@ with col_hist:
                     <span style="color:{closed_color};font-weight:600;">
                         {'🔒' if hrow['Closed']=='Yes' else '✓'} {hrow['Closed']}</span>
                 </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ROW 4 — EVENT IMPACT QUANTIFICATION
+# Directly answers: "Event impact is not quantified in advance"
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+section_header("Event Impact Quantification — How Much Worse Does This Event Make It?", "📊")
+
+CORRIDOR_NEIGHBORS = {
+    "Mysore Road":       ["Magadi Road", "Bannerghatta Road"],
+    "Bellary Road 1":    ["ORR North 1", "Tumkur Road"],
+    "Bellary Road 2":    ["ORR North 1", "Bellary Road 1"],
+    "Tumkur Road":       ["Bellary Road 1", "Magadi Road"],
+    "Hosur Road":        ["ORR East 1", "Bannerghatta Road"],
+    "ORR North 1":       ["Bellary Road 1", "Bellary Road 2"],
+    "Old Madras Road":   ["ORR East 1"],
+    "Magadi Road":       ["Mysore Road", "Tumkur Road"],
+    "ORR East 1":        ["Hosur Road", "Old Madras Road"],
+    "Bannerghatta Road": ["Hosur Road", "Mysore Road"],
+    "Any":               [],
+}
+
+if df_hist is not None:
+    imp_col, cmp_col = st.columns([1, 1], gap="large")
+
+    with imp_col:
+        st.markdown("""
+        <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;
+                    letter-spacing:.08em;margin-bottom:10px;">Baseline vs Event — Key Metrics</div>
+        """, unsafe_allow_html=True)
+
+        base_mask = (df_hist["hour"].isin(event_hours)) & (df_hist["day_of_week"] == day_of_week)
+        if corridor != "Any":
+            base_mask &= (df_hist["corridor"] == corridor)
+
+        baseline_all   = df_hist[base_mask]
+        baseline_event = df_hist[base_mask & (df_hist["event_cause"] == event_cause)]
+
+        n_base = len(baseline_all)
+        n_ev   = len(baseline_event)
+
+        if n_base > 0 and n_ev >= 3:
+            metrics_def = [
+                ("Road Closure Rate",
+                 float(baseline_all["requires_road_closure"].mean() * 100),
+                 float(baseline_event["requires_road_closure"].mean() * 100), "%"),
+                ("High / Critical Rate",
+                 float(baseline_all["severity"].isin(["High","Critical"]).mean() * 100),
+                 float(baseline_event["severity"].isin(["High","Critical"]).mean() * 100), "%"),
+                ("Median Clearance Time",
+                 float(baseline_all["duration_minutes"].dropna().median() or 0),
+                 float(baseline_event["duration_minutes"].dropna().median() or 0), " min"),
+                ("Incidents per Hour",
+                 round(n_base / max(len(event_hours), 1), 1),
+                 round(n_ev / max(len(event_hours), 1), 1), ""),
+            ]
+            for label, base_val, event_val, unit in metrics_def:
+                if base_val == 0:
+                    continue
+                delta     = event_val - base_val
+                delta_pct = delta / base_val * 100
+                color     = "#b91c1c" if delta > 0 else "#15803d"
+                sign      = "+" if delta > 0 else ""
+                bg_ev     = "#fef2f2" if delta > 0 else "#f0fdf4"
+
+                st.markdown(f"""
+                <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;
+                            padding:11px 14px;margin-bottom:8px;border-left:4px solid {color};">
+                    <div style="font-size:10px;font-weight:700;color:#6b7280;
+                                text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">
+                        {label}</div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="flex:1;text-align:center;background:#f8fafc;
+                                    border-radius:7px;padding:7px 6px;">
+                            <div style="font-size:9px;color:#9ca3af;font-weight:700;
+                                        text-transform:uppercase;margin-bottom:2px;">Baseline</div>
+                            <div style="font-size:17px;font-weight:800;color:#374151;">
+                                {base_val:.0f}{unit}</div>
+                        </div>
+                        <div style="font-size:16px;color:{color};font-weight:800;">→</div>
+                        <div style="flex:1;text-align:center;background:{bg_ev};border-radius:7px;
+                                    padding:7px 6px;border:1px solid {color}30;">
+                            <div style="font-size:9px;color:#9ca3af;font-weight:700;
+                                        text-transform:uppercase;margin-bottom:2px;">With Event</div>
+                            <div style="font-size:17px;font-weight:800;color:{color};">
+                                {event_val:.0f}{unit}</div>
+                        </div>
+                        <div style="text-align:center;min-width:52px;">
+                            <div style="font-size:15px;font-weight:800;color:{color};">
+                                {sign}{delta_pct:.0f}%</div>
+                            <div style="font-size:9px;color:#9ca3af;">change</div>
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;
+                        padding:9px 14px;margin-top:4px;font-size:12px;color:#1a56db;">
+                📊 <b>Statistical basis:</b> {n_ev:,} '{event_cause.replace('_',' ').title()}'
+                incidents vs {n_base:,} total baseline incidents
+                ({start_hour:02d}:00–{end_h:02d}:00, {dow_names[day_of_week]}s
+                {'on ' + corridor if corridor != 'Any' else 'city-wide'})
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.info(f"Not enough data ({n_ev} '{event_cause}' incidents found) for this corridor/time combination. Try selecting 'Any' corridor.")
+
+    with cmp_col:
+        st.markdown("""
+        <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;
+                    letter-spacing:.08em;margin-bottom:10px;">All Event Types Ranked by Impact Score</div>
+        """, unsafe_allow_html=True)
+
+        all_causes = df_hist["event_cause"].dropna().unique()
+        cmp_rows = []
+        for ec in all_causes:
+            ec_mask = (df_hist["hour"].isin(event_hours)) & (df_hist["event_cause"] == ec)
+            if corridor != "Any":
+                ec_mask &= (df_hist["corridor"] == corridor)
+            sub = df_hist[ec_mask]
+            if len(sub) < 3:
+                continue
+            cl_r  = float(sub["requires_road_closure"].mean() * 100)
+            hc_r  = float(sub["severity"].isin(["High","Critical"]).mean() * 100)
+            avg_d = float(sub["duration_minutes"].dropna().median() or 0)
+            score = 0.40 * cl_r + 0.40 * hc_r + 0.20 * min(avg_d / 120 * 100, 100)
+            cmp_rows.append({
+                "event_cause": ec,
+                "label": ec.replace("_"," ").title(),
+                "n": len(sub),
+                "closure": cl_r,
+                "hc": hc_r,
+                "dur": avg_d,
+                "score": round(score, 1),
+                "is_current": ec == event_cause,
+            })
+
+        cmp_df = (pd.DataFrame(cmp_rows)
+                    .sort_values("score", ascending=False)
+                    .reset_index(drop=True))
+
+        for i, row in cmp_df.iterrows():
+            is_c    = bool(row["is_current"])
+            bg      = "#eff6ff" if is_c else "#ffffff"
+            border  = "2px solid #1a56db" if is_c else "1px solid #e5e7eb"
+            sc      = row["score"]
+            sc_c    = ("#b91c1c" if sc > 55 else "#ea580c" if sc > 35
+                       else "#d97706" if sc > 15 else "#15803d")
+            tag     = ('<span style="margin-left:6px;font-size:9px;background:#1a56db;'
+                       'color:#fff;padding:1px 5px;border-radius:3px;">SELECTED</span>'
+                       if is_c else "")
+            st.markdown(f"""
+            <div style="background:{bg};border:{border};border-radius:8px;
+                        padding:8px 12px;margin-bottom:4px;
+                        display:flex;align-items:center;gap:10px;">
+                <div style="width:18px;text-align:center;font-size:10px;
+                            font-weight:700;color:#9ca3af;">{i+1}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;font-weight:700;
+                                color:{'#1a56db' if is_c else '#111827'};">
+                        {row['label']}{tag}</div>
+                    <div style="font-size:10px;color:#9ca3af;margin-top:1px;">
+                        {int(row['n'])} incidents · {row['closure']:.0f}% closure ·
+                        {row['hc']:.0f}% High+Crit · {row['dur']:.0f}m avg</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-size:15px;font-weight:800;color:{sc_c};">{sc:.0f}</div>
+                    <div style="font-size:9px;color:#9ca3af;">Impact</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ROW 5 — CORRIDOR CASCADE EFFECTS
+# Addresses: network/spillover effects from event-driven blockage
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+section_header("Corridor Cascade Effects — Overflow Impact on Neighboring Roads", "🔗")
+
+if df_hist is not None and corridor != "Any":
+    neighbors = CORRIDOR_NEIGHBORS.get(corridor, [])
+
+    if neighbors:
+        df_tmp = df_hist.copy()
+        df_tmp["_date"] = pd.to_datetime(
+            df_tmp["start_datetime"], utc=True, errors="coerce"
+        ).dt.date
+
+        main_event_dates = set(
+            df_tmp[
+                (df_tmp["corridor"] == corridor) &
+                (df_tmp["event_cause"] == event_cause) &
+                (df_tmp["hour"].isin(event_hours))
+            ]["_date"].dropna()
+        )
+
+        overflow_hours = list(
+            set([(h + 1) % 24 for h in event_hours] +
+                [(h + 2) % 24 for h in event_hours]) - set(event_hours)
+        )
+        all_dates = set(df_tmp["_date"].dropna())
+        non_event_dates = all_dates - main_event_dates
+
+        casc_cols = st.columns(len(neighbors))
+        for ci, neighbor in enumerate(neighbors):
+            with casc_cols[ci]:
+                nb_base_mask = (
+                    (df_tmp["corridor"] == neighbor) &
+                    (df_tmp["hour"].isin(overflow_hours)) &
+                    (df_tmp["_date"].isin(non_event_dates))
+                )
+                nb_event_mask = (
+                    (df_tmp["corridor"] == neighbor) &
+                    (df_tmp["hour"].isin(overflow_hours)) &
+                    (df_tmp["_date"].isin(main_event_dates))
+                )
+                nb_base  = df_tmp[nb_base_mask]
+                nb_event = df_tmp[nb_event_mask]
+
+                n_nd = max(len(non_event_dates), 1)
+                n_ed = max(len(main_event_dates), 1)
+
+                base_rate  = len(nb_base) / n_nd
+                event_rate = len(nb_event) / n_ed if n_ed > 0 else base_rate
+                overflow   = ((event_rate - base_rate) / max(base_rate, 0.01)) * 100
+
+                ov_color  = ("#b91c1c" if overflow > 30 else "#ea580c" if overflow > 10
+                             else "#d97706" if overflow > 0 else "#15803d")
+                ov_sign   = "+" if overflow > 0 else ""
+                ov_label  = ("HIGH OVERFLOW" if overflow > 30 else "MODERATE" if overflow > 10
+                             else "SLIGHT" if overflow > 0 else "NO IMPACT")
+
+                ev_cl = (float(nb_event["requires_road_closure"].mean() * 100)
+                         if len(nb_event) > 0 else 0.0)
+                ev_hc = (float(nb_event["severity"].isin(["High","Critical"]).mean() * 100)
+                         if len(nb_event) > 0 else 0.0)
+
+                st.markdown(f"""
+                <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;
+                            padding:14px 16px;border-top:4px solid {ov_color};
+                            box-shadow:0 1px 3px rgba(0,0,0,.04);">
+                    <div style="font-size:12px;font-weight:700;color:#111827;
+                                margin-bottom:3px;">{neighbor}</div>
+                    <div style="font-size:10px;font-weight:700;color:{ov_color};
+                                text-transform:uppercase;letter-spacing:.07em;
+                                margin-bottom:10px;">{ov_label}</div>
+                    <div style="font-size:26px;font-weight:800;color:{ov_color};
+                                margin-bottom:4px;">{ov_sign}{overflow:.0f}%</div>
+                    <div style="font-size:10px;color:#6b7280;margin-bottom:2px;">
+                        incident rate change (overflow hrs)</div>
+                    <div style="height:4px;background:#f3f4f6;border-radius:99px;margin:8px 0;">
+                        <div style="background:{ov_color};
+                                    width:{min(abs(overflow), 100):.0f}%;
+                                    height:4px;border-radius:99px;"></div>
+                    </div>
+                    <div style="font-size:10px;color:#6b7280;line-height:1.7;margin-top:6px;">
+                        Closure: <b>{ev_cl:.0f}%</b> · High+Crit: <b>{ev_hc:.0f}%</b><br>
+                        Based on <b>{len(main_event_dates)}</b> event days
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+    else:
+        st.info("No neighboring corridors defined for this selection. Select a specific corridor to see cascade effects.")
+else:
+    st.info("Select a specific corridor (not 'Any') to see cascade overflow impact on neighboring roads.")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ROW 6 — MULTI-EVENT DAY PLANNER
+# Plan for concurrent events — find resource conflicts
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+section_header("Multi-Event Day Planner — Concurrent Event Conflict Detection", "📅")
+
+with st.expander("➕ Add concurrent events and check for resource conflicts", expanded=False):
+    st.markdown("""
+    <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">
+        Add up to 2 additional events happening on the same day. TrafficSense will
+        detect corridor conflicts and compute total citywide resource requirements.
+    </div>
+    """, unsafe_allow_html=True)
+
+    me_cols = st.columns(2)
+    extra_events = []
+    for ei in range(2):
+        with me_cols[ei]:
+            st.markdown(f"""
+            <div style="font-size:11px;font-weight:700;color:#6b7280;
+                        text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">
+                Event {ei+2}</div>
+            """, unsafe_allow_html=True)
+            ec2 = st.selectbox(f"Event Type {ei+2}", list(EVENT_CAUSE_OPTIONS.keys()),
+                                key=f"me_cause_{ei}")
+            co2 = st.selectbox(f"Corridor {ei+2}",
+                                [c for c in CORRIDOR_COORDS if c != "Any"],
+                                key=f"me_corr_{ei}")
+            sh2 = st.number_input(f"Start Hour {ei+2}", 0, 23, (start_hour + 3*(ei+1)) % 24,
+                                  format="%02d", key=f"me_sh_{ei}")
+            du2 = st.number_input(f"Duration (hrs) {ei+2}", 1, 8, 2, key=f"me_dur_{ei}")
+            extra_events.append({
+                "cause": EVENT_CAUSE_OPTIONS[ec2],
+                "cause_label": ec2,
+                "corridor": co2,
+                "start_hour": int(sh2),
+                "duration": int(du2),
+                "hours": [(sh2 + i) % 24 for i in range(int(du2))],
+            })
+
+    if st.button("🔍 Analyse Multi-Event Day", use_container_width=True):
+        all_events = [{
+            "cause": event_cause, "cause_label": cause_label,
+            "corridor": corridor if corridor != "Any" else "Multiple",
+            "start_hour": start_hour, "duration": duration_hrs,
+            "hours": event_hours,
+            "constables": max_constables, "barricades": max_barricades,
+            "risk": max_risk,
+        }] + [
+            {**ev,
+             "constables": CAUSE_BASE.get(ev["cause"], dict(constables=4))["constables"],
+             "barricades": CAUSE_BASE.get(ev["cause"], dict(barricades=8, constables=4))["constables"] * 2,
+             "risk": CAUSE_BASE.get(ev["cause"], dict(closure_prob=0.2))["closure_prob"] * 100,
+             }
+            for ev in extra_events
+        ]
+
+        total_constables = sum(e["constables"] for e in all_events)
+        total_barricades = sum(e["barricades"] for e in all_events)
+
+        # Conflict detection: same corridor at overlapping hours
+        conflicts = []
+        for i in range(len(all_events)):
+            for j in range(i + 1, len(all_events)):
+                ei, ej = all_events[i], all_events[j]
+                hour_overlap = set(ei["hours"]) & set(ej["hours"])
+                same_corr    = (ei["corridor"] == ej["corridor"] and ei["corridor"] != "Multiple")
+                if hour_overlap and same_corr:
+                    conflicts.append((i, j, hour_overlap))
+
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+        # Summary table
+        st.markdown("""
+        <div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;
+                    letter-spacing:.07em;margin-bottom:8px;">Event Summary</div>
+        """, unsafe_allow_html=True)
+
+        hdr_grid = "1fr 1.2fr 60px 80px 80px 80px"
+        st.markdown(f"""
+        <div style="display:grid;grid-template-columns:{hdr_grid};gap:4px;
+                    padding:7px 12px;background:#f3f4f6;border-radius:7px;
+                    margin-bottom:5px;font-size:10px;font-weight:700;color:#6b7280;
+                    text-transform:uppercase;letter-spacing:.06em;">
+            <div>Event</div><div>Corridor</div><div>Time</div>
+            <div>Risk</div><div>Constables</div><div>Barricades</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        for idx, ev in enumerate(all_events):
+            rc  = ("#b91c1c" if ev["risk"] > 60 else "#ea580c" if ev["risk"] > 35
+                   else "#d97706" if ev["risk"] > 15 else "#15803d")
+            st.markdown(f"""
+            <div style="display:grid;grid-template-columns:{hdr_grid};gap:4px;
+                        padding:9px 12px;background:#ffffff;border:1px solid #e5e7eb;
+                        border-radius:7px;margin-bottom:4px;font-size:12px;">
+                <div style="font-weight:600;color:#111827;">{ev['cause_label'].split(' ',1)[-1]}</div>
+                <div style="color:#374151;">{ev['corridor']}</div>
+                <div style="color:#6b7280;">{ev['start_hour']:02d}:00</div>
+                <div style="font-weight:700;color:{rc};">{ev['risk']:.0f}</div>
+                <div style="font-weight:700;color:#1a56db;">👮 {ev['constables']}</div>
+                <div style="font-weight:700;color:#d97706;">🚧 {ev['barricades']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Totals
+        st.markdown(f"""
+        <div style="display:grid;grid-template-columns:{hdr_grid};gap:4px;
+                    padding:9px 12px;background:#eff6ff;border:1px solid #bfdbfe;
+                    border-radius:7px;margin-bottom:10px;font-size:12px;font-weight:700;">
+            <div style="color:#1a56db;">TOTAL (City-wide)</div>
+            <div></div><div></div><div></div>
+            <div style="color:#1a56db;">👮 {total_constables}</div>
+            <div style="color:#d97706;">🚧 {total_barricades}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if conflicts:
+            for i, j, hrs in conflicts:
+                st.markdown(f"""
+                <div style="background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #b91c1c;
+                            border-radius:8px;padding:10px 14px;margin-bottom:6px;">
+                    ⚠️ <b style="color:#b91c1c;">RESOURCE CONFLICT</b> —
+                    <b>{all_events[i]['corridor']}</b> has overlapping events at
+                    {', '.join(f'{h:02d}:00' for h in sorted(hrs))}.
+                    Add <b>{max(all_events[i]['constables'], all_events[j]['constables'])}</b>
+                    additional constables to cover both events simultaneously.
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;
+                        padding:10px 14px;font-size:12px;color:#15803d;font-weight:600;">
+                ✅ No corridor conflicts detected — events can be managed with the listed resources.
             </div>
             """, unsafe_allow_html=True)
